@@ -1,7 +1,10 @@
 import type { JSX } from "react"
+import { Route } from "../Route"
 
-
-export const HomePage = ({ children, title }: { children: JSX.Element, title: string }) => {
+export const HomePage = ({ children, title }: { 
+  children: JSX.Element, 
+  title: string 
+}) => {
   return (
     <html lang="en">
     <head>
@@ -15,3 +18,11 @@ export const HomePage = ({ children, title }: { children: JSX.Element, title: st
     </html>
   )
 }
+
+let route = new Route(
+  <HomePage title="HomePage">
+    <div>Your content here</div>
+  </HomePage>
+)
+
+export default route;

@@ -1,4 +1,12 @@
-import type { JSX } from "react"
+import { writeFile } from 'fs/promises';
+
+export class IndexTsxFile {
+  path: string;
+  constructor(path: string) {
+    this.path = path;
+  }
+  async write() {
+    await writeFile(this.path, `import type { JSX } from "react"
 
 export const HomePage = ({ children, title }: { 
   children: JSX.Element, 
@@ -25,4 +33,6 @@ let route = new Route(
 )
 
 export default route;
-  
+  `)
+  }
+}
