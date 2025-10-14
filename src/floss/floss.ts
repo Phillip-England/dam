@@ -7,15 +7,18 @@ export function absPath(...pathsToJoin: string[]): string {
   return path.join(process.cwd(), ...pathsToJoin);
 }
 
-export async function walkDir(dirPath: string) {
+export async function walkDir(
+  dirPath: string, 
+  callback: (path: string, isDirectory: boolean) => void | Promise<void>
+) {
   const files = await readdir(dirPath, { withFileTypes: true })
   for (const file of files) {
     const path = join(dirPath, file.name);
     if (file.isDirectory()) {
-      console.log('DIR:', path);
-      await walkDir(path);
+      await callback(path, true);
+      await walkDir(path, callback);
     } else {
-      console.log('FILE:', path);
+      await callback(path, false);
     }
   }
 }

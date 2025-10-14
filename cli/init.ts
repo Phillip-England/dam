@@ -1,4 +1,3 @@
-import { exit } from "process"
 import { hasFlag } from "../src/grub/args"
 import { Cmd } from "../src/grub/Cmd"
 import { argString } from "../src/grub/ArgSchema";
@@ -9,14 +8,9 @@ import { writeFile } from 'fs/promises';
 
 let cmd = new Cmd()
 
-cmd.setSchema({
-  "name": argString(3),
-})
-
 cmd.setOperation(async () => {
   console.log('initalizing a new project..')
-  let projectName = cmd.getArg('name') as string
-  let projectPath = path.join(process.cwd(), projectName);
+  let projectPath = path.join(process.cwd(), 'app');
   await checkForReset(projectPath);
   await ensureProjectDoesntExist(projectPath);
   await mkdir(projectPath)
