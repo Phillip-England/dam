@@ -7,7 +7,8 @@ let cmd = new Cmd()
 
 cmd.setOperation(async () => {
   console.log('initalizing a new project..')
-  let appDir = await AppDir.new(path.join(process.cwd(), 'app'), hasFlag('-r'))
+  let appDir = await AppDir.create(path.join(process.cwd(), 'app'), hasFlag('-r'))
+  console.log(appDir.files.read(appDir.routesFilePath))
   console.log('initalization complete!')
 })
  

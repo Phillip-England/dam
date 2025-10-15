@@ -2,6 +2,7 @@ import path from 'path';
 import { readdir } from 'fs/promises';
 import { access, stat } from 'fs/promises';
 import { join } from 'path';
+import { rmdir } from 'fs/promises';
 
 export function absPath(...pathsToJoin: string[]): string {
   return path.join(process.cwd(), ...pathsToJoin);
@@ -38,5 +39,11 @@ export async function dirExists(path: string): Promise<boolean> {
     return stats.isDirectory();
   } catch {
     return false;
+  }
+}
+
+export async function rmdirIfExists(path: string) {
+  if (await dirExists(path)) {
+    await rmdir(path);
   }
 }

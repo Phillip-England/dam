@@ -1,6 +1,6 @@
 import type { JSX } from "react"
-
-export const HomePage = ({ children, title }: { 
+      
+export const GuestLayout = ({ children, title }: { 
   children: JSX.Element, 
   title: string 
 }) => {
@@ -12,17 +12,8 @@ export const HomePage = ({ children, title }: {
       <title>{title}</title>
     </head>
     <body>
-      {children}
+      <main>{children}</main>
     </body>
     </html>
   )
 }
-
-let route = new Route(
-  <HomePage title="HomePage">
-    <div>Your content here</div>
-  </HomePage>
-)
-
-export default route;
-  
