@@ -1,5 +1,10 @@
 import { GuestLayout } from "../layouts/layouts"
           
 export let html = <GuestLayout title="HomePage">
-  <h1>Your content here</h1>
+  <>
+    <div className='p-4'>
+      <h1 className='font-bold text-3xl'>Amazing Websites!</h1>
+      <p>Made with ease</p>
+    </div>
+  </>
 </GuestLayout>

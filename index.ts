@@ -1,6 +1,12 @@
+import { cmdBuild } from "./src/cmdBuild"
+import { cmdHelp } from "./src/cmdHelp"
+import { cmdInit } from "./src/cmdInit"
+import { cmdServe } from "./src/cmdServe"
+import { Grub } from "grub"
 
-import path from 'path';
-import { Grub } from './src/grub/Grub';
-
-let cli = new Grub(path.join(process.cwd(), "cli"))
-await cli.run()
+let cli = new Grub(cmdHelp, cmdInit, cmdBuild, cmdServe)
+try {
+  await cli.run();
+} catch (err: any) {
+  console.error(err.message);
+}

@@ -1,12 +1,11 @@
 import path from "path";
-import { dirExists } from "../floss/floss";
+import { dirExists } from "floss";
 import { rm } from "fs/promises";
-import { DiskRecord, DiskSpawn, DiskPull } from "../diskspawn/DiskSpawn";
+import { VirtualAsset, VirtualFS } from "hoist";
 
 export class AppDir {
   path: string;
   shouldReset: boolean;
-  files: DiskPull = new DiskPull();
   componentsDirPath: string;
   componentsFilePath: string;
   layoutsDirPath: string;
@@ -15,6 +14,8 @@ export class AppDir {
   staticCssFilePath: string;
   routesDirPath: string;
   routesFilePath: string;
+  buildDirPath: string;
+  vfs: VirtualFS | undefined;
   constructor(appDirPath: string, shouldReset: boolean) {
     this.path = appDirPath;
     this.shouldReset = shouldReset;
@@ -26,6 +27,8 @@ export class AppDir {
     this.staticCssFilePath = path.join(this.staticDirPath, 'input.css');
     this.routesDirPath = path.join(this.path, 'routes')
     this.routesFilePath = path.join(this.routesDirPath, 'index.tsx')
+    this.buildDirPath = path.join(this.path, 'build');
+    this.vfs = undefined
   }
 
   static async create(path: string, shouldReset: boolean): Promise<AppDir> {
@@ -33,8 +36,7 @@ export class AppDir {
     await appDir.checkForReset()
     await appDir.ensureDoesntExist()
     await appDir.spawnToDisk()
-    let loadedAppDir = await AppDir.load(appDir.path)
-    return loadedAppDir;
+    return appDir;
   }
   async checkForReset() {
     if (this.shouldReset) {
@@ -51,13 +53,14 @@ export class AppDir {
     }
   }
   async spawnToDisk() {
-    let spawn = new DiskSpawn([
-      DiskRecord.dir(this.path),
-      DiskRecord.dir(this.componentsDirPath),
-      DiskRecord.dir(this.layoutsDirPath),
-      DiskRecord.dir(this.staticDirPath),
-      DiskRecord.dir(this.routesDirPath),
-      DiskRecord.file(this.componentsFilePath, `export const Header = () => {
+    let vfs = await VirtualFS.create(this.path, {
+      [this.path]: VirtualAsset.rootDir(),
+      [this.componentsDirPath]: VirtualAsset.dir(),
+      [this.layoutsDirPath]: VirtualAsset.dir(),
+      [this.staticDirPath]: VirtualAsset.dir(),
+      [this.routesDirPath]: VirtualAsset.dir(),
+      [this.buildDirPath]: VirtualAsset.dir(),
+      [this.componentsFilePath]: VirtualAsset.file(`export const Header = () => {
   return (
     <header>
       <h1>Hello, World!</h1>
@@ -74,7 +77,7 @@ export const Footer = () => {
   )
 }     
 `),
-      DiskRecord.file(this.layoutsFilePath, `import type { JSX } from "react"
+      [this.layoutsFilePath]: VirtualAsset.file(`import type { JSX } from "react"
       
 export const GuestLayout = ({ children, title }: { 
   children: JSX.Element, 
@@ -94,32 +97,22 @@ export const GuestLayout = ({ children, title }: {
   )
 }
 `),
-      DiskRecord.file(this.routesFilePath, `import { GuestLayout } from "../layouts/layouts"
+      [this.routesFilePath]: VirtualAsset.file(`import { GuestLayout } from "../layouts/layouts"
           
 export let html = <GuestLayout title="HomePage">
   <h1>Your content here</h1>
 </GuestLayout>
 `),
-      DiskRecord.file(this.staticCssFilePath, `@import 'tailwindcss'`)
-    ]);
-    await spawn.writeToDisk();
+      [this.staticCssFilePath]: VirtualAsset.file(`@import 'tailwindcss'`)
+    })
+    this.vfs = vfs;
   }
+
   
 static async load(appDirPath: string): Promise<AppDir> {
   const appDir = new AppDir(appDirPath, false);
-  const puller = new DiskPull();
-  await puller.loadFromDisk([
-    DiskPull.dir(appDir.path),
-    DiskPull.dir(appDir.componentsDirPath),
-    DiskPull.dir(appDir.layoutsDirPath),
-    DiskPull.dir(appDir.staticDirPath),
-    DiskPull.dir(appDir.routesDirPath),
-    DiskPull.file(appDir.componentsFilePath),
-    DiskPull.file(appDir.layoutsFilePath),
-    DiskPull.file(appDir.staticCssFilePath),
-    DiskPull.file(appDir.routesFilePath),
-  ]);
-  appDir.files = puller;
+  let vfs = await VirtualFS.load(appDir.path)
+  appDir.vfs = vfs;
   return appDir;
 }
 

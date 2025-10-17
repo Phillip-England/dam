@@ -9,6 +9,7 @@ export const GuestLayout = ({ children, title }: {
     <head>
       <meta charSet="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="stylesheet" href='../static/output.css'></link>
       <title>{title}</title>
     </head>
     <body>
